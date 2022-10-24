@@ -112,6 +112,43 @@ AFRAME.registerComponent('resonance-audio-src', {
     }
   },
 
+  /* hacky fix for updating moving sound sources */
+
+  tock: function () {
+    var el = this.el;
+    var A = this.el;
+    
+    this.room &&
+      A.src !== this.data.src &&
+      this.connectSrc(this.data.src),
+      this.el.sceneEl.object3D.updateMatrixWorld(!0),
+      this.updateSoundSettings(),
+      this.updatePlaybackSettings(),
+      this.toggleShowVisualization(A.visualize, this.data.visualize),
+      this.updateResonancePosition().updateVisualization();
+    const t = this.getRoomChoice();
+    (t && t.components && t.components["resonance-audio-room"]) !==
+      this.room &&
+      s(this.el.sceneEl, () => {
+        const A = this.leaveRoom(),
+          e = this.enter(t);
+        this.connectSrc(this.data.src),
+          this.updateSoundSettings(),
+          this.el.sceneEl.object3D.updateMatrixWorld(!0),
+          this.updateResonancePosition().updateVisualization(),
+          A &&
+            this.el.emit("audioroom-left", {
+              src: this.el,
+              room: A.el,
+            }),
+          e &&
+            this.el.emit("audioroom-entered", {
+              src: this.el,
+              room: e.el,
+            });
+      }); 
+  },
+
   /**
    * Update the Resonance sound settings.
    */
